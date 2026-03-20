@@ -17,8 +17,9 @@ from datetime import datetime
 import schedule
 
 from social_agent import run_once
+from emailer import send_digest
 
-SOCIAL_SCAN_INTERVAL_MINUTES = 120  # social media moves slower than job boards
+SOCIAL_SCAN_INTERVAL_MINUTES = 60
 
 
 def _job():
@@ -28,7 +29,12 @@ def _job():
         new_leads = run_once()
         print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Scan complete. New signals: {new_leads}")
     except Exception as e:
-        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ERROR: {e}")
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ERROR during scan: {e}")
+
+    try:
+        send_digest()
+    except Exception as e:
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ERROR sending email: {e}")
 
 
 def _handle_shutdown(signum, frame):
