@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Datadog Lead Finder</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f5f4f8; color: #222; }
+
+    header {
+      background: #632CA6;
+      color: white;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 20px; font-weight: 600; }
+    header span { font-size: 13px; opacity: 0.8; }
+
+    .container { max-width: 1200px; margin: 32px auto; padding: 0 24px; }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    #scan-btn {
+      background: #632CA6;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #scan-btn:hover:not(:disabled) { background: #4e2285; }
+    #scan-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    #status-msg { font-size: 14px; color: #666; }
+    #status-msg.running { color: #632CA6; font-weight: 500; }
+    #status-msg.error { color: #c0392b; }
+
+    .badge {
+      display: inline-block;
+      background: #ede8f7;
+      color: #632CA6;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    thead { background: #f0eafa; }
+    th {
+      text-align: left;
+      padding: 12px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #632CA6;
+      letter-spacing: 0.05em;
+    }
+    td {
+      padding: 12px 14px;
+      font-size: 13px;
+      border-top: 1px solid #f0edf8;
+      vertical-align: top;
+    }
+    tr:hover td { background: #faf8ff; }
+
+    .platform-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .platform-reddit   { background: #FF4500; color: white; }
+    .platform-twitter,
+    .platform-x        { background: #000; color: white; }
+    .platform-linkedin { background: #0A66C2; color: white; }
+
+    .intent-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .intent-actively_seeking { background: #d4edda; color: #155724; }
+    .intent-comparing        { background: #cce5ff; color: #004085; }
+    .intent-venting          { background: #fff3cd; color: #856404; }
+    .intent-sharing_pain     { background: #f8d7da; color: #721c24; }
+
+    .score {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 13px;
+      background: #ede8f7;
+      color: #632CA6;
+    }
+    .score.high { background: #632CA6; color: white; }
+
+    .snippet { color: #555; font-size: 12px; max-width: 300px; line-height: 1.5; }
+    .pain-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .pain-tag {
+      background: #f0eafa;
+      color: #4a1f8c;
+      font-size: 11px;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    a { color: #632CA6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .empty { text-align: center; color: #aaa; padding: 48px; font-size: 15px; }
+
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid #ccc;
+      border-top-color: #632CA6;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Datadog Lead Finder</h1>
+  <span>Social Media Signals</span>
+</header>
+
+<div class="container">
+  <div class="toolbar">
+    <button id="scan-btn" onclick="startScan()">Scan Now</button>
+    <span id="status-msg">
+      {% if leads %}{{ leads|length }} lead{{ 's' if leads|length != 1 }} stored
+      {% else %}No leads yet — press Scan Now{% endif %}
+    </span>
+  </div>
+
+  {% if leads %}
+  <table>
+    <thead>
+      <tr>
+        <th>Platform</th>
+        <th>Author</th>
+        <th>Company</th>
+        <th>Intent</th>
+        <th>Pain Points</th>
+        <th>Snippet</th>
+        <th>Score</th>
+        <th>Found</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for l in leads %}
+      <tr>
+        <td>
+          <span class="platform-badge platform-{{ l.platform }}">{{ l.platform }}</span>
+        </td>
+        <td>
+          {% if l.post_url %}<a href="{{ l.post_url }}" target="_blank">{{ l.author }}</a>
+          {% else %}{{ l.author }}{% endif %}
+          {% if l.author_title %}<br><span style="color:#888;font-size:11px">{{ l.author_title }}</span>{% endif %}
+        </td>
+        <td>{{ l.company or '—' }}</td>
+        <td>
+          <span class="intent-tag intent-{{ l.intent }}">
+            {{ {'actively_seeking':'Seeking','comparing':'Comparing','venting':'Venting','sharing_pain':'Sharing Pain'}.get(l.intent, l.intent) }}
+          </span>
+        </td>
+        <td>
+          <div class="pain-tags">
+            {% for p in l.pain_points %}<span class="pain-tag">{{ p }}</span>{% endfor %}
+          </div>
+        </td>
+        <td><div class="snippet">{{ l.post_snippet[:220] if l.post_snippet else '—' }}</div></td>
+        <td><span class="score {% if l.pain_score >= 3 %}high{% endif %}">{{ l.pain_score }}</span></td>
+        <td style="color:#aaa;font-size:11px;white-space:nowrap">{{ l.discovered_at[:16] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">No leads yet. Press <strong>Scan Now</strong> to start.</div>
+  {% endif %}
+</div>
+
+<script>
+  function startScan() {
+    const btn = document.getElementById('scan-btn');
+    const msg = document.getElementById('status-msg');
+    btn.disabled = true;
+    msg.className = 'running';
+    msg.innerHTML = '<span class="spinner"></span>Scanning Reddit, X, LinkedIn… this takes ~2 minutes';
+
+    fetch('/scan', { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'started') {
+          pollStatus();
+        } else {
+          msg.className = 'error';
+          msg.textContent = 'Error starting scan.';
+          btn.disabled = false;
+        }
+      })
+      .catch(() => {
+        msg.className = 'error';
+        msg.textContent = 'Error connecting to server.';
+        btn.disabled = false;
+      });
+  }
+
+  function pollStatus() {
+    fetch('/scan/status')
+      .then(r => r.json())
+      .then(data => {
+        if (data.running) {
+          setTimeout(pollStatus, 3000);
+        } else {
+          window.location.reload();
+        }
+      });
+  }
+</script>
+
+</body>
+</html>
