@@ -146,8 +146,9 @@ For each result:
 2. Fetch the post URL to read the full content
 3. Note the pain being expressed — this is what the reply comment will address
 
-Include ANY post with a genuine pain complaint — seniority is less important here,
-as a helpful comment can reach the whole thread.
+Only include posts where the author appears to be a decision-maker:
+founder, co-founder, CTO, VP Engineering, Head of Infrastructure, Engineering Manager,
+Principal/Staff Engineer. Skip students, junior devs, or hobbyists.
 
 Aim for 5-10 posts. Stop after 5 searches.
 
