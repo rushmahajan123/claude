@@ -7,6 +7,7 @@ Usage:
 """
 
 import json
+import os
 import sqlite3
 import threading
 from flask import Flask, render_template, jsonify
@@ -65,5 +66,6 @@ def scan_status():
 
 if __name__ == "__main__":
     init_social_db()
-    print("Starting Datadog Lead Finder → http://localhost:5000")
-    app.run(debug=False, port=5000)
+    port = int(os.getenv("PORT", 5000))
+    print(f"Starting Datadog Lead Finder → http://localhost:{port}")
+    app.run(debug=False, host="0.0.0.0", port=port)
