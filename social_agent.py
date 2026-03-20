@@ -125,29 +125,49 @@ Output ONLY the JSON array at the end, preceded by the marker: LEADS_JSON:
 """
 
 
-SEARCH_PROMPT = """Search Reddit ONLY for startup founders, CTOs, VPs of Engineering,
-and senior engineers who are expressing pain around monitoring, observability, logging,
-alerting, incident response, or infrastructure visibility — problems that Datadog solves.
+SEARCH_PROMPT = """Search Reddit for posts from the last 24 hours where people are
+complaining about or struggling with monitoring, observability, alerting, on-call,
+or infrastructure visibility problems.
 
-IMPORTANT: Only include posts from the last 24 hours. Skip anything older.
+The goal: find posts I can reply to with a helpful comment that offers value
+and invites them to book a call.
 
-Use these Reddit searches — do 5 searches max, pick the best results:
+IMPORTANT: Only posts from the last 24 hours. Skip anything older.
 
-- site:reddit.com/r/devops "monitoring" "nightmare" OR "pain" OR "frustrated" OR "broken"
-- site:reddit.com/r/sre "alert fatigue" OR "too many alerts" OR "on-call burnout"
+Do up to 5 web searches using queries like:
+- site:reddit.com/r/devops "monitoring" "painful" OR "nightmare" OR "frustrated"
+- site:reddit.com/r/sre "alert fatigue" OR "on-call" "burnout" OR "nightmare"
 - site:reddit.com/r/devops "replacing" OR "alternatives to" "datadog" OR "new relic" OR "splunk"
-- site:reddit.com/r/kubernetes "monitoring" "prometheus" "painful" OR "too much work"
-- site:reddit.com/r/devops "no visibility" OR "flying blind" production incidents
+- site:reddit.com/r/kubernetes "monitoring" "prometheus" "too much work" OR "painful"
+- site:reddit.com/r/devops "no visibility" OR "flying blind" production
 
-For each interesting result:
+For each result:
 1. Check the post date — skip if older than 24 hours
-2. Fetch the post to get full text
-3. Is the author a founder, CTO, VP Eng, or senior engineer? Skip if not.
-4. What pain points are they expressing?
+2. Fetch the post URL to read the full content
+3. Note the pain being expressed — this is what the reply comment will address
 
-Quality over quantity — aim for 5-10 leads. Stop after 5 searches.
+Include ANY post with a genuine pain complaint — seniority is less important here,
+as a helpful comment can reach the whole thread.
 
-Output ONLY the JSON array at the end, preceded by the marker: LEADS_JSON:
+Aim for 5-10 posts. Stop after 5 searches.
+
+Output a JSON array preceded by the marker LEADS_JSON:
+Each lead must follow this exact format:
+{
+  "platform": "reddit",
+  "author": "username",
+  "author_title": "inferred role or empty string",
+  "company": "company name or empty string",
+  "post_url": "https://...",
+  "post_snippet": "First 400 chars of the post...",
+  "pain_points": ["alert fatigue", "Prometheus maintenance"],
+  "pain_score": 3,
+  "intent": "venting"
+}
+
+Intent values: "actively_seeking", "comparing", "venting", "sharing_pain"
+
+Output ONLY the JSON array after LEADS_JSON:
 """
 
 
