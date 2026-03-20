@@ -1,0 +1,26 @@
+name: devops-job-search-agent
+workers:
+  - name: job-search
+    github:
+      repo: rushmahajan123/claude
+      branch: main
+      deploy_on_push: true
+    run_command: python scheduler.py
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    envs:
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_TIME
+        type: SECRET
+  - name: social-search
+    github:
+      repo: rushmahajan123/claude
+      branch: main
+      deploy_on_push: true
+    run_command: python social_scheduler.py
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    envs:
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_TIME
+        type: SECRET
