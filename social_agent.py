@@ -125,48 +125,29 @@ Output ONLY the JSON array at the end, preceded by the marker: LEADS_JSON:
 """
 
 
-SEARCH_PROMPT = """Search Reddit, X (Twitter/X), and LinkedIn for startup founders,
-CTOs, VPs of Engineering, and senior engineers who are expressing pain around
-monitoring, observability, logging, alerting, incident response, or infrastructure
-visibility — problems that Datadog solves.
+SEARCH_PROMPT = """Search Reddit ONLY for startup founders, CTOs, VPs of Engineering,
+and senior engineers who are expressing pain around monitoring, observability, logging,
+alerting, incident response, or infrastructure visibility — problems that Datadog solves.
 
-Use a variety of searches. Here are example queries to mix, vary, and expand on:
+IMPORTANT: Only include posts from the last 24 hours. Skip anything older.
 
-### Reddit searches
+Use these Reddit searches — do 5 searches max, pick the best results:
+
 - site:reddit.com/r/devops "monitoring" "nightmare" OR "pain" OR "frustrated" OR "broken"
 - site:reddit.com/r/sre "alert fatigue" OR "too many alerts" OR "on-call burnout"
-- site:reddit.com/r/devops "looking for" OR "recommend" monitoring observability tool startup
-- site:reddit.com/r/kubernetes "monitoring" "we have" OR "our stack" "prometheus" "painful"
 - site:reddit.com/r/devops "replacing" OR "alternatives to" "datadog" OR "new relic" OR "splunk"
-- site:reddit.com/r/ExperiencedDevs "observability" OR "monitoring" "startup" pain problem
-- site:reddit.com/r/aws "cloudwatch" "not enough" OR "limitations" OR "frustrating" startup
+- site:reddit.com/r/kubernetes "monitoring" "prometheus" "painful" OR "too much work"
 - site:reddit.com/r/devops "no visibility" OR "flying blind" production incidents
-- site:reddit.com/r/sre "MTTR" OR "time to resolve" OR "incident" "we had no" data logs
-- site:reddit.com/r/startups "cto" OR "engineering" monitoring observability infrastructure
-
-### X / Twitter searches
-- site:twitter.com OR site:x.com "on-call" "nightmare" OR "alert fatigue" startup engineer
-- site:x.com "prometheus grafana" "painful" OR "maintenance" OR "annoying"
-- site:x.com "monitoring" "startup" "CTO" OR "founder" problem visibility production
-- site:x.com "we had an outage" OR "production down" "no idea" logs metrics
-- site:twitter.com "observability" "wish we had" OR "need better" startup
-
-### LinkedIn searches
-- site:linkedin.com/posts "production incident" "no visibility" OR "flying blind" founder CTO
-- site:linkedin.com "monitoring" "lessons learned" outage startup founder
-- site:linkedin.com/posts "alert fatigue" OR "on-call burnout" engineering manager
-- site:linkedin.com "observability" "recommendation" OR "what do you use" VP engineering
-- site:linkedin.com "splunk" OR "new relic" "too expensive" OR "alternatives" startup
 
 For each interesting result:
-1. Fetch the post/thread to get the full text
-2. Assess: is the author a founder, CTO, VP Eng, or senior engineer?
-3. What specific pain point(s) are they expressing?
-4. Are they actively looking for a solution or just venting?
-5. Include author bio/title context if visible
+1. Check the post date — skip if older than 24 hours
+2. Fetch the post to get full text
+3. Is the author a founder, CTO, VP Eng, or senior engineer? Skip if not.
+4. What pain points are they expressing?
 
-Be thorough and search multiple platforms. Quality over quantity — only include
-genuine decision-makers or senior engineers at companies (not students or hobbyists).
+Quality over quantity — aim for 5-10 leads. Stop after 5 searches.
+
+Output ONLY the JSON array at the end, preceded by the marker: LEADS_JSON:
 """
 
 

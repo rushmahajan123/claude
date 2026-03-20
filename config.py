@@ -15,7 +15,7 @@ SEARCH_INTERVAL_MINUTES = int(os.getenv("SEARCH_INTERVAL_MINUTES", "60"))
 DB_PATH = os.getenv("DB_PATH", "jobs.db")
 
 # Max web searches per agent run (controls cost)
-MAX_SEARCHES_PER_RUN = int(os.getenv("MAX_SEARCHES_PER_RUN", "20"))
+MAX_SEARCHES_PER_RUN = int(os.getenv("MAX_SEARCHES_PER_RUN", "5"))
 
 # Job boards and sources to search
 JOB_SOURCES = [
